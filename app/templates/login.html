@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}Member Login{% endblock %}
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        $(document).on ("click", ".memberlogin", function () {
+            var data = {"email":$("#email").val(), "password":$("#password").val(), "csrf":$('meta[name=csrf-token]').attr("content")};
+            console.log('submitted' + data);
+            socket.emit('login user', {json: data});
+{#            document.getElementById('login').innerText = 'Loading...\n';#}
+        });
+        socket.on('user note', function(message) {
+            document.getElementById('login').innerText = message + "\n";
+        });
+    </script>
+{% endblock %}
+{% block content %}
+    <h1>Member Login</h1>
+    <form id="login">
+        <label for="email">Email</label>
+        <input type="text" id="email">
+        <label for="password">Password</label>
+        <input type="password" id="password">
+        <input type="button" value="Login" class='memberlogin'>
+    </form>
+{% endblock %}

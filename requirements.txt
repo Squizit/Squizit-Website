@@ -1,0 +1,9 @@
+Flask==0.10.1
+Flask-SocketIO==2.2
+remodel>=0.4.4
+rethinkdb==2.3.0.post3
+Flask-Login==0.3.2
+Flask-Mail==0.9.1
+Flask-WTF==0.12
+eventlet==0.19.0
+Flask-Bcrypt==0.7.1

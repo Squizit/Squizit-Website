@@ -1,0 +1,11 @@
+{% macro form(f) -%}
+    {{ f.csrf_token }}
+    {% for fi in f %}
+        {{ f.fi.label }} {{ f.fi }}
+{#        {% if fi.errors %}#}
+{#            {% for error in fi.errors %}#}
+{#                {{ error }}#}
+{#            {% endfor %}#}
+{#        {% endif %}#}
+    {% endfor %}
+{%- endmacro %}
