@@ -2,26 +2,36 @@
 {% block title %}Add Member{% endblock %}
 {% block head %}
     {{ super() }}
-    <script type="text/javascript" charset="utf-8">
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
-        $(document).on ("click", ".addmember", function () {
-            var data = {"email":$("#email").val(), "password":$("#password").val(), "csrf":$('meta[name=csrf-token]').attr("content")};
-            console.log('submitted' + data);
-            socket.emit('add user', {json: data});
-{#            document.getElementById('adduser').innerText = 'Loading...\n';#}
-        });
-        socket.on('form note', function(message) {
-            document.getElementById('adduser').innerText = message + '\n';
-        });
-    </script>
+
 {% endblock %}
 {% block content %}
     <h1>Add Member</h1>
-    <form id="adduser">
+    <form id="adduser" method="post">
+        <label for="name">First Name</label>
+        <input type="text" id="name">
         <label for="email">Email</label>
         <input type="text" id="email">
         <label for="password">Password</label>
         <input type="password" id="password">
-        <input type="button" value="Add" class='addmember'>
     </form>
+    <i>Press enter to add user</i>
+    <script type="text/javascript" charset="utf-8">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        $('#adduser').keypress(function(e) {
+            if(e.keyCode == 13) {
+                var data = {
+                    "email": $("#email").val(),
+                    "password": $("#password").val(),
+                    "name": $("#name").val(),
+                    "csrf": $('meta[name=csrf-token]').attr("content")
+                };
+                console.log('submitted' + data);
+                socket.emit('add user', {json: data});
+                $("#adduser").find("input[type=text], input[type=password]").attr("disabled", "disabled");
+            }
+        });
+        socket.on('add user response', function() {
+            $("#adduser").find("input[type=text], input[type=password]").removeAttr("disabled").val("");
+        });
+    </script>
 {% endblock %}
