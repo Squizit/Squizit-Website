@@ -5,11 +5,12 @@
 {% endblock %}
 {% block content %}
     <h1>Member Login</h1>
-    <form id="login">
+    <form id="login" action="{{ url_for('login_usr') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <label for="email">Email</label>
-        <input type="text" id="email">
+        <input type="text" id="email" name="email">
         <label for="password">Password</label>
-        <input type="password" id="password">
+        <input type="password" id="password" name="password">
     </form>
     <i>Press enter to login</i>
     <script type="text/javascript" charset="utf-8">
@@ -29,6 +30,9 @@
         socket.on('login user response', function() {
             $(".addmember").removeAttr("disabled");
             $("#adduser").find("input[type=text], input[type=password]").val("");
+        });
+        socket.on('login user accept', function() {
+            $("#login").submit();
         });
     </script>
 {% endblock %}

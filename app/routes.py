@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, g, request, url_for, redirect
 from flask_login import current_user, login_user, login_required
 from flask_wtf.csrf import validate_csrf
 
@@ -9,11 +9,12 @@ from app.models import User
 @app.before_request
 def check_csrf():
     csrf.protect()
+    g.user = current_user
 
 
 @login.user_loader
 def load_user(user_id):
-    return User.get(id=id)
+    return User.get(id=user_id)
 
 
 @app.route('/')
@@ -30,6 +31,7 @@ def adduser():
 def connect_handler():
     if current_user.is_authenticated:
         socketio.emit('sb', 'Hello ' + current_user['name'] + '!')
+        print(current_user['name'])
     else:
         pass
 
@@ -41,14 +43,28 @@ def user_form(json):
         socketio.emit('login user response')
         if user is not None:
             if bcrypt.check_password_hash(user['password'], json['json']['password']):
-                login_user(user)
-                socketio.emit('sb', 'Logged in!')
+                socketio.emit('sb', 'Logging in...')
+                socketio.emit('login user accept')
             else:
                 socketio.emit('sb', 'Password incorrect')
         else:
             socketio.emit('sb', 'User not found')
     else:
         socketio.emit('sb', 'Please reload the page and try again')
+
+
+@app.route('/login_usr', methods=['POST'])
+def login_usr():
+    if request.method == 'POST':
+        user = User.get(email=request.form['email'])
+        if user is not None:
+            if bcrypt.check_password_hash(user['password'], request.form['password']):
+                login_user(user)
+                return redirect(url_for('login'))
+            else:
+                return 'paserr'
+        else:
+            return 'userr'
 
 
 @socketio.on('add user')
